@@ -1,31 +1,88 @@
-# Resumind
+# Resumind - Multi-Agent Resume Crafting System
 
-An agentic resume and interview prep tool built with Flask and HTMX.
+A sophisticated AI-powered resume generation platform that intelligently matches your experiences to specific companies and job postings using a three-agent architecture.
 
-## Features
+## What is Resumind?
 
-- **Tailored Resume Generation**: AI-powered resume drafts optimized for specific job descriptions
-- **Interview Prep Questions**: Behavioral, technical, and team-fit questions with coaching tips
-- **ATS Keyword Analysis**: Match report showing keyword alignment and gaps
-- **Export Options**: Download resumes and questions in Markdown format, print to PDF
-- **Privacy-First**: No data persistence - everything runs in memory
+Resumind revolutionizes resume creation by analyzing company preferences and tailoring your experiences to match specific job requirements. Unlike generic resume builders, Resumind uses specialized AI agents to understand what each company values and optimizes your resume accordingly.
 
-## Setup
+## How It Works
+
+### Three Specialized AI Agents
+
+1. **Company Insight Agent**
+   - Analyzes the job posting and company information
+   - Identifies company-specific resume preferences (e.g., "Google prefers quantifiable impact metrics")
+   - Extracts key requirements and important keywords
+   - Detects tone and formatting expectations
+
+2. **Experience Summarizer Agent**
+   - Converts your raw profile data into structured accomplishment summaries
+   - Highlights quantifiable metrics and impact
+   - Identifies transferable skills relevant to the role
+   - Uses strong action verbs and achievement-focused language
+
+3. **Alignment Agent**
+   - Matches your experiences to the specific role requirements
+   - Ranks experiences by relevance to the position
+   - Tailors bullet points to company preferences and keywords
+   - Ensures ATS (Applicant Tracking System) optimization
+
+### Two-Step Process
+
+**Step 1: Build Your Profile**
+Enter your comprehensive professional profile once:
+- Personal information (name, contact, LinkedIn, portfolio)
+- Education history with GPA and achievements
+- Work experiences with detailed accomplishments
+- Technical and soft skills
+- Projects and side work
+
+**Step 2: Target a Role**
+For each job application, provide:
+- Company name
+- Role title
+- Complete job description (paste from posting)
+- Optional: Company culture notes or additional information
+
+**Step 3: Get Your Tailored Resume**
+Resumind generates:
+- A customized resume optimized for the specific role
+- Keyword coverage analysis showing ATS optimization
+- Agent insights explaining tailoring decisions
+- Both HTML preview and Markdown download
+
+## Key Features
+
+- **Multi-Agent Intelligence**: Three specialized AI agents work together for superior results
+- **ATS Optimization**: Automatic keyword matching and coverage analysis
+- **Company-Specific Tailoring**: Detects and adapts to company resume preferences
+- **Session-Based Storage**: Save your profile, generate multiple tailored resumes
+- **Reusable Profiles**: Enter your information once, use it for many applications
+- **Secure & Private**: HTML sanitization, local database, your data stays with you
+- **Fallback Mode**: Works even without AI, using intelligent rule-based generation
+
+## Technology Stack
+
+- **Backend**: Python 3.11 + Flask 3.0.3
+- **Database**: SQLite with SQLAlchemy ORM
+- **AI**: OpenAI GPT-4o-mini (via Replit AI Integrations)
+- **Frontend**: Jinja2 templates + vanilla JavaScript
+- **Security**: Bleach HTML sanitization
+
+## Getting Started
 
 ### On Replit (Recommended)
 
 The app uses Replit AI Integrations for OpenAI access (no API key needed - charges are billed to your Replit credits).
 
 1. The integration is already configured in this project
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Run the app:
+2. Dependencies are automatically installed
+3. Click "Run" or execute:
    ```bash
    python app.py
    ```
-4. Access at `http://localhost:5000`
+4. Access at the provided webview URL
 
 ### Using Your Own OpenAI API Key (Optional)
 
@@ -36,64 +93,114 @@ If you prefer to use your own OpenAI API key:
 
 ### Fallback Mode
 
-If no OpenAI access is available, the app automatically falls back to a rules-based generator that still produces functional resumes and interview questions.
+If no OpenAI access is available, the app automatically falls back to rule-based generation that still produces functional resumes.
 
 ## Usage
 
-1. **Paste Job Description**: Copy the job posting you're targeting
-2. **Add Your Experience**: Type or upload your resume/experience as a text file
-3. **Generate**: Click the button to create:
-   - Tailored resume (HTML preview + Markdown download)
-   - Interview prep questions (Markdown download)
-   - ATS keyword match report
+1. **Create Your Profile**
+   - Visit the homepage and fill out the comprehensive profile form
+   - Include as much detail as possible for better results
+   - Add multiple education entries, experiences, skills, and projects
 
-4. **Export**: 
-   - Print the resume preview to PDF using your browser (Ctrl/Cmd + P)
-   - Download Markdown files for editing
+2. **Target a Specific Role**
+   - After saving your profile, you'll be redirected to the role form
+   - Paste the complete job description
+   - Add any additional company information you know
 
-## Tech Stack
+3. **Review Your Tailored Resume**
+   - View the HTML preview of your customized resume
+   - Check the keyword coverage analysis
+   - Read agent insights to understand tailoring decisions
+   - Download the Markdown version
 
-- **Backend**: Python 3.11, Flask 3.0.3
-- **AI**: OpenAI GPT-4o-mini (via Replit AI Integrations)
-- **Frontend**: Jinja2 templates, HTMX for dynamic updates
-- **Styling**: Custom utility CSS (Tailwind-inspired)
-- **Session Management**: In-memory storage with UUIDs
+4. **Apply with Confidence**
+   - Use the tailored resume for your application
+   - Repeat steps 2-3 for each new job posting
+
+## Database Schema
+
+The application stores:
+- **UserProfile**: Your personal and professional information
+- **Education**: Academic history with achievements
+- **Experience**: Work history with accomplishments
+- **Skill**: Technical and soft skills with proficiency levels
+- **Project**: Side projects and portfolio work
+- **RoleSubmission**: Each tailored resume with cached agent outputs
+
+All data is stored locally in `resumind.db` and persists across sessions.
+
+## Security Features
+
+- **HTML Sanitization**: All user and AI-generated content is sanitized before storage
+- **Input Validation**: Form data validated before database insertion
+- **SQL Injection Protection**: Parameterized queries via SQLAlchemy ORM
+- **Session Security**: Secure server-side sessions
+- **Privacy-First**: Your data stays local, you control it
 
 ## Project Structure
 
 ```
 /resumind
-  ├─ app.py                 # Flask application and routes
-  ├─ prompts.py            # AI prompt templates
-  ├─ generators.py         # OpenAI and fallback generators
-  ├─ utils.py              # ATS analysis and utilities
-  ├─ requirements.txt      # Python dependencies
-  ├─ static/
-  │   └─ styles.css        # Custom CSS
-  └─ templates/
-      ├─ base.html         # Base layout
-      ├─ index.html        # Main form
-      └─ partial_result.html  # Results display
+├── app.py                          # Main Flask application
+├── models/
+│   ├── __init__.py                 # Database instance
+│   └── user_profile.py             # ORM models
+├── services/
+│   ├── orchestration.py            # Agent coordinator
+│   └── agents/
+│       ├── company_insight_agent.py
+│       ├── experience_summarizer_agent.py
+│       └── alignment_agent.py
+├── templates/
+│   ├── base.html
+│   ├── profile_form.html           # Step 1: Profile input
+│   ├── role_form.html              # Step 2: Role targeting
+│   ├── resume_result.html          # Results display
+│   └── error.html
+├── static/
+│   └── styles.css
+├── utils.py                        # Keyword utilities
+└── requirements.txt
 ```
+
+## Why Multi-Agent?
+
+Traditional resume builders use templates or single AI prompts. Resumind's multi-agent approach provides:
+
+1. **Specialization**: Each agent focuses on one task it does extremely well
+2. **Better Analysis**: Company preferences are analyzed separately from experience summarization
+3. **Explainability**: See what each agent detected and decided
+4. **Reliability**: If one agent fails, others continue; fallback mode ensures results
+5. **Quality**: Multiple passes of refinement produce superior resumes
 
 ## Next Steps
 
 Potential enhancements:
 
-- **RAG Integration**: Add retrieval over high-performing resume corpus
-- **Template Variations**: A/B test different resume formats
-- **Outcome Tracking**: "Did you get an interview?" feedback loop
-- **User Authentication**: Save multiple resume versions
-- **Database Persistence**: Store resumes and track improvements
-- **Advanced ATS**: Deeper keyword analysis and optimization suggestions
-
-## Notes
-
-- Maximum input length: 20,000 characters per field
-- Session data is temporary and cleared when the page is refreshed
-- For best PDF export results, use Chrome or Edge browser
-- The fallback generator uses keyword extraction and templates when AI is unavailable
+- **User Authentication**: Multi-user support with login
+- **Resume History**: View and compare previous tailored resumes
+- **Template Selection**: Multiple resume formats and styles
+- **PDF Export**: Direct PDF generation (currently print to PDF)
+- **Company Database**: Pre-populated company preference knowledge
+- **Resume Scoring**: ATS compatibility score with improvement suggestions
+- **A/B Testing**: Track which resume versions get interviews
+- **LinkedIn Import**: Auto-populate profile from LinkedIn
+- **Cover Letter Generation**: Additional agent for cover letters
+- **Real-time Collaboration**: Share resumes with mentors/friends
 
 ## Privacy
 
-This MVP processes all data in memory and does not persist user information. Your job descriptions and experience are only stored temporarily during your session.
+Your professional profile and resume data are stored locally in the SQLite database. No information is sent to external services except OpenAI API calls for AI-powered generation (which can be disabled by running in fallback mode).
+
+## Development
+
+To run locally:
+```bash
+python app.py
+```
+
+The app will start on `http://0.0.0.0:5000`
+
+## License
+
+Built with ❤️ for job seekers everywhere.
