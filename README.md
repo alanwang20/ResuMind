@@ -1,6 +1,8 @@
-# Resumind - Multi-Agent Resume Crafting System
+# ResuMind
 
-A sophisticated AI-powered resume generation platform that intelligently matches your experiences to specific companies and job postings using a three-agent architecture.
+> **AI-Powered Resume Tailoring for the Modern Job Seeker**
+
+ResuMind is a multi-agent resume crafting system that automatically parses your resume and generates perfectly tailored versions for any job posting—powered by six specialized AI agents working in parallel.
 
 ## What is Resumind?
 
