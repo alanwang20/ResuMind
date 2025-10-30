@@ -84,7 +84,7 @@ def extract_text_from_file(file):
                 text.append(page.extract_text())
             return '\n'.join(text)
         
-        elif file_ext in ['docx', 'doc']:
+        elif file_ext == 'docx':
             from docx import Document
             doc = Document(io.BytesIO(file.read()))
             text = []

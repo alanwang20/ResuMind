@@ -17,11 +17,11 @@
     <div style="background: rgba(255,255,255,0.15); border: 2px dashed rgba(255,255,255,0.4); border-radius: 8px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s;" 
          id="dropZone"
          onclick="document.getElementById('resumeFile').click()">
-        <input type="file" id="resumeFile" accept=".pdf,.docx,.doc,.txt" style="display: none;" onchange="handleFileSelect(event)">
+        <input type="file" id="resumeFile" accept=".pdf,.docx,.txt" style="display: none;" onchange="handleFileSelect(event)">
         <div id="uploadPrompt">
             <div style="font-size: 3rem; margin-bottom: 0.5rem;">📄</div>
             <p style="font-size: 1.1rem; font-weight: 500; margin-bottom: 0.5rem;">Click to upload or drag & drop</p>
-            <p style="font-size: 0.9rem; opacity: 0.9;">Supports PDF, DOCX, or TXT files</p>
+            <p style="font-size: 0.9rem; opacity: 0.9;">Supports PDF, DOCX, or TXT files (max 25MB)</p>
         </div>
         <div id="uploadStatus" style="display: none;">
             <div style="font-size: 2rem; margin-bottom: 0.5rem;">⏳</div>
@@ -254,7 +254,7 @@ function handleFileSelect(event) {
 }
 
 async function handleFileUpload(file) {
-    const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'text/plain'];
+    const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
     
     if (!validTypes.includes(file.type)) {
         showUploadState('error', 'Invalid file type. Please upload a PDF, DOCX, or TXT file.');
@@ -272,16 +272,19 @@ async function handleFileUpload(file) {
             body: formData
         });
         
+        const data = await response.json();
+        
         if (!response.ok) {
-            throw new Error('Failed to parse resume');
+            const errorMsg = data.error || 'Failed to parse resume';
+            showUploadState('error', errorMsg);
+            return;
         }
         
-        const data = await response.json();
         populateFormWithParsedData(data);
         showUploadState('success');
     } catch (error) {
         console.error('Error parsing resume:', error);
-        showUploadState('error', error.message);
+        showUploadState('error', 'Network error. Please try again.');
     }
 }
 

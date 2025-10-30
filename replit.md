@@ -9,7 +9,7 @@ Resumind is a sophisticated multi-agent system that crafts tailored resumes by a
 ## Architecture
 
 ### Multi-Agent System
-The application uses three specialized AI agents coordinated by an orchestrator:
+The application uses four specialized AI agents coordinated by an orchestrator:
 
 1. **Company Insight Agent** (`services/agents/company_insight_agent.py`)
    - Analyzes job postings and company information
@@ -29,8 +29,15 @@ The application uses three specialized AI agents coordinated by an orchestrator:
    - Tailors bullet points to company preferences and keywords
    - Ensures ATS optimization with keyword coverage
 
-4. **Resume Orchestrator** (`services/orchestration.py`)
-   - Coordinates all three agents in sequence
+4. **Resume Parser Agent** (`services/agents/resume_parser_agent.py`)
+   - Extracts structured information from uploaded resume files
+   - Parses PDF, DOCX, and TXT formats
+   - Uses OpenAI to intelligently extract: personal info, education, experience, skills, projects
+   - Fallback uses regex and keyword extraction for basic parsing
+   - Auto-populates profile form to save user time
+
+5. **Resume Orchestrator** (`services/orchestration.py`)
+   - Coordinates all agents in sequence
    - Handles fallback to rules-based generation if AI unavailable
    - Logs agent decisions and timing
    - Provides debugging information
@@ -119,12 +126,21 @@ Display: Resume Preview + ATS Analysis + Agent Insights
 ## User Flow
 
 ### Step 1: Profile Creation
-User enters comprehensive profile information:
-- Personal details (name, contact, links)
-- Education history (with GPA, achievements)
-- Work experiences (with achievements)
-- Skills (categorized, with proficiency)
-- Projects (optional, with technologies)
+Users have two options:
+
+**Option A: Upload Resume (Quick Start)**
+- Click or drag-and-drop existing resume (PDF, DOCX, or TXT)
+- AI automatically extracts and parses all information
+- Form fields auto-populate with extracted data
+- Review and edit as needed
+
+**Option B: Manual Entry**
+- Enter comprehensive profile information manually:
+  - Personal details (name, contact, links)
+  - Education history (with GPA, achievements)
+  - Work experiences (with achievements)
+  - Skills (categorized, with proficiency)
+  - Projects (optional, with technologies)
 
 Data is validated and stored in SQLite database with unique session ID.
 
@@ -195,6 +211,14 @@ Each agent has a rules-based fallback:
 - Keyword matching for coverage analysis
 
 ## Recent Changes
+**October 30, 2025 - Resume Upload & Parsing Feature**
+- Added Resume Parser Agent (4th agent) that extracts structured data from uploaded resumes
+- Implemented file upload with drag-and-drop support for PDF, DOCX, and TXT files
+- Auto-populates all form fields from parsed resume data
+- Supports PDF text extraction (PyPDF2), DOCX parsing (python-docx), and plain text
+- Beautiful gradient UI for upload zone with loading/success/error states
+- Seamless user experience: upload → parse → auto-fill → review → submit
+
 **October 30, 2025 - Multi-Agent System Implementation**
 - Complete architectural redesign from single-shot to multi-agent system
 - Created three specialized AI agents with orchestration
