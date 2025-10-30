@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form hx-post="/generate" hx-target="#result" hx-swap="innerHTML" hx-indicator="#spinner">
+    <div class="grid">
+        <div class="card">
+            <h2>Job Description</h2>
+            <div class="form-group">
+                <label for="job_description">Paste the job description you're targeting:</label>
+                <textarea 
+                    id="job_description" 
+                    name="job_description" 
+                    placeholder="Paste the job description here..."
+                    required></textarea>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Your Experience</h2>
+            <div class="form-group">
+                <label for="user_experience">Describe your experience, projects, and skills:</label>
+                <textarea 
+                    id="user_experience" 
+                    name="user_experience" 
+                    placeholder="List your experience, projects, achievements, and skills..."
+                    required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="resume_file">Or upload a text file (optional):</label>
+                <input type="file" id="resume_file" name="resume_file" accept=".txt">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <button type="submit" class="btn-primary">Generate Resume & Interview Prep</button>
+    </div>
+</form>
+
+<div id="spinner" class="spinner"></div>
+
+<div id="result"></div>
+{% endblock %}

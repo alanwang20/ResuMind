@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumind - Agentic Resume & Interview Prep</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Resumind</h1>
+            <p>Agentic resumes + interview prep</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-notice">
+                Your inputs are processed in memory and not stored on the server in this MVP. Clear the page to remove your content.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

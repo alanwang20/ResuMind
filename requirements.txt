@@ -1,0 +1,6 @@
+flask==3.0.3
+werkzeug==3.0.3
+python-dotenv==1.0.1
+openai==1.53.0
+markdown==3.6
+bleach==6.1.0

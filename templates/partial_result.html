@@ -1,0 +1,58 @@
+{% if error %}
+<div class="error-message">
+    <strong>Error:</strong> {{ error }}
+</div>
+{% else %}
+<div class="result-grid">
+    <div>
+        <div class="resume-preview">
+            <div class="print-hint">
+                Tip: Use your browser's Print function (Ctrl/Cmd + P) and select "Save as PDF" to export this resume.
+            </div>
+            {{ resume_html | safe }}
+        </div>
+        <div class="download-links">
+            <a href="/download/resume/{{ session_id }}" class="download-link">Download Resume.md</a>
+        </div>
+    </div>
+
+    <div>
+        <div class="questions-section">
+            <h3>Interview Preparation Questions</h3>
+            {{ questions_html | safe }}
+        </div>
+        <div class="download-links">
+            <a href="/download/questions/{{ session_id }}" class="download-link">Download Questions.md</a>
+        </div>
+
+        <div class="ats-section">
+            <h3>ATS Keyword Match Report</h3>
+            
+            <h4>Top Matches (keywords from job description found in your experience):</h4>
+            {% if ats_report.top_matches %}
+            <ul class="ats-list">
+                {% for keyword, count in ats_report.top_matches %}
+                <li>
+                    <span class="match-keyword">{{ keyword }}</span>
+                    <span class="match-count">({{ count }} mention{{ 's' if count != 1 else '' }})</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No matching keywords found.</p>
+            {% endif %}
+
+            <h4 style="margin-top: 1.5rem;">Top Gaps (keywords from job description missing from your experience):</h4>
+            {% if ats_report.top_gaps %}
+            <ul class="ats-list">
+                {% for keyword in ats_report.top_gaps %}
+                <li><span class="gap-keyword">{{ keyword }}</span></li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No gaps found - excellent keyword coverage!</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
