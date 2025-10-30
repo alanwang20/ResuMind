@@ -1,200 +1,87 @@
+<div align="center">
+
 # ResuMind
+### *Agentic Resume Intelligence*
 
-> **AI-Powered Resume Tailoring for the Modern Job Seeker**
+**Upload once. Tailor infinitely.**  
+AI-powered resume optimization using six specialized agents working in parallel.
 
-ResuMind is a multi-agent resume crafting system that automatically parses your resume and generates perfectly tailored versions for any job posting—powered by six specialized AI agents working in parallel.
+---
 
-## What is Resumind?
+</div>
 
-Resumind revolutionizes resume creation by analyzing company preferences and tailoring your experiences to match specific job requirements. Unlike generic resume builders, Resumind uses specialized AI agents to understand what each company values and optimizes your resume accordingly.
+## 🎯 Long-Term Vision
 
-## How It Works
+The long-term goal for ResuMind is to evolve from a resume-tailoring prototype into a **personal career copilot**—an adaptive agent that grows alongside the user.
 
-### Three Specialized AI Agents
+Instead of static resume edits, ResuMind will learn over time which narratives resonate with specific companies, industries, and recruiters, shaping both what users say and how they present it.
 
-1. **Company Insight Agent**
-   - Analyzes the job posting and company information
-   - Identifies company-specific resume preferences (e.g., "Google prefers quantifiable impact metrics")
-   - Extracts key requirements and important keywords
-   - Detects tone and formatting expectations
+Ultimately, the system would become an **autonomous career agent** capable of searching roles, aligning application materials, generating personalized simulations, and learning from outcomes—a closed-loop AI that helps people tell their professional story with clarity, confidence, and precision.
 
-2. **Experience Summarizer Agent**
-   - Converts your raw profile data into structured accomplishment summaries
-   - Highlights quantifiable metrics and impact
-   - Identifies transferable skills relevant to the role
-   - Uses strong action verbs and achievement-focused language
+---
 
-3. **Alignment Agent**
-   - Matches your experiences to the specific role requirements
-   - Ranks experiences by relevance to the position
-   - Tailors bullet points to company preferences and keywords
-   - Ensures ATS (Applicant Tracking System) optimization
+## 🚀 What It Does Right Now
 
-### Two-Step Process
+ResuMind is an **upload-first resume crafting system** powered by six specialized AI agents:
 
-**Step 1: Build Your Profile**
-Enter your comprehensive professional profile once:
-- Personal information (name, contact, LinkedIn, portfolio)
-- Education history with GPA and achievements
-- Work experiences with detailed accomplishments
-- Technical and soft skills
-- Projects and side work
+### **Upload → Parse → Tailor**
 
-**Step 2: Target a Role**
-For each job application, provide:
-- Company name
-- Role title
-- Complete job description (paste from posting)
-- Optional: Company culture notes or additional information
+1. **Upload your resume** (PDF, DOCX, or TXT)
+2. **Auto-parse and store** your education, experience, skills, and projects
+3. **Enter job details** for the role you're applying to
+4. **Get a tailored resume** optimized for that specific job with real-time ATS scoring (0-100)
 
-**Step 3: Get Your Tailored Resume**
-Resumind generates:
-- A customized resume optimized for the specific role
-- Keyword coverage analysis showing ATS optimization
-- Agent insights explaining tailoring decisions
-- Both HTML preview and Markdown download
+---
 
-## Key Features
+## 🧠 The Six Specialist Agents
 
-- **Multi-Agent Intelligence**: Three specialized AI agents work together for superior results
-- **ATS Optimization**: Automatic keyword matching and coverage analysis
-- **Company-Specific Tailoring**: Detects and adapts to company resume preferences
-- **Session-Based Storage**: Save your profile, generate multiple tailored resumes
-- **Reusable Profiles**: Enter your information once, use it for many applications
-- **Secure & Private**: HTML sanitization, local database, your data stays with you
-- **Fallback Mode**: Works even without AI, using intelligent rule-based generation
+ResuMind uses a Huntr.co-inspired **parallel multi-agent architecture** where each agent specializes in one task:
 
-## Technology Stack
+1. **Resume Parser Agent**  
+   Extracts structured data from your uploaded resume (education, work history, skills, projects)
 
-- **Backend**: Python 3.11 + Flask 3.0.3
-- **Database**: SQLite with SQLAlchemy ORM
-- **AI**: OpenAI GPT-4o-mini (via Replit AI Integrations)
-- **Frontend**: Jinja2 templates + vanilla JavaScript
-- **Security**: Bleach HTML sanitization
+2. **Job Description Analyzer Agent**  
+   Parses job postings to identify key requirements, keywords, and company tone
 
-## Getting Started
+3. **Content Optimizer Agent**  
+   Rewrites bullet points to match job requirements while maintaining authenticity
 
-### On Replit (Recommended)
+4. **ATS Match Scoring Agent**  
+   Provides real-time 0-100 scoring for keyword optimization and ATS compatibility
 
-The app uses Replit AI Integrations for OpenAI access (no API key needed - charges are billed to your Replit credits).
+5. **Proofreading & Quality Agent**  
+   Catches grammar issues, improves clarity, and ensures professional tone
 
-1. The integration is already configured in this project
-2. Dependencies are automatically installed
-3. Click "Run" or execute:
-   ```bash
-   python app.py
-   ```
-4. Access at the provided webview URL
+6. **Role Calibration Agent**  
+   Ranks your experiences by relevance and tailors presentation for the specific role
 
-### Using Your Own OpenAI API Key (Optional)
+All agents work **in parallel** for speed, with intelligent fallbacks when AI is unavailable.
 
-If you prefer to use your own OpenAI API key:
+---
 
-1. Add `OPENAI_API_KEY` to your Replit Secrets
-2. The app will automatically use it instead of the Replit integration
+## ⚡ Key Features
 
-### Fallback Mode
+- **Upload-First Workflow** – Parse your resume automatically, no manual data entry
+- **Real-Time ATS Scoring** – See how well your resume matches the job (0-100 scale)
+- **Keyword Optimization** – Automatically identify and optimize for job-specific terms
+- **Multi-Agent Intelligence** – Six specialists working together for superior results
+- **Graceful Fallbacks** – Works even without OpenAI using regex-based parsing
+- **Privacy-First** – Your data stays local in SQLite, you control it
+- **Session-Based** – Upload once, generate tailored resumes for multiple jobs
 
-If no OpenAI access is available, the app automatically falls back to rule-based generation that still produces functional resumes.
+---
 
-## Usage
+## 🛠️ Tech Stack
 
-1. **Create Your Profile**
-   - Visit the homepage and fill out the comprehensive profile form
-   - Include as much detail as possible for better results
-   - Add multiple education entries, experiences, skills, and projects
+- **Backend:** Python 3.11 + Flask 3.0.3
+- **Database:** SQLite with SQLAlchemy ORM
+- **AI:** OpenAI GPT-4 (optional, with intelligent fallbacks)
+- **Parsing:** PyPDF2, python-docx
+- **Security:** Bleach HTML sanitization, parameterized queries
 
-2. **Target a Specific Role**
-   - After saving your profile, you'll be redirected to the role form
-   - Paste the complete job description
-   - Add any additional company information you know
+---
 
-3. **Review Your Tailored Resume**
-   - View the HTML preview of your customized resume
-   - Check the keyword coverage analysis
-   - Read agent insights to understand tailoring decisions
-   - Download the Markdown version
-
-4. **Apply with Confidence**
-   - Use the tailored resume for your application
-   - Repeat steps 2-3 for each new job posting
-
-## Database Schema
-
-The application stores:
-- **UserProfile**: Your personal and professional information
-- **Education**: Academic history with achievements
-- **Experience**: Work history with accomplishments
-- **Skill**: Technical and soft skills with proficiency levels
-- **Project**: Side projects and portfolio work
-- **RoleSubmission**: Each tailored resume with cached agent outputs
-
-All data is stored locally in `resumind.db` and persists across sessions.
-
-## Security Features
-
-- **HTML Sanitization**: All user and AI-generated content is sanitized before storage
-- **Input Validation**: Form data validated before database insertion
-- **SQL Injection Protection**: Parameterized queries via SQLAlchemy ORM
-- **Session Security**: Secure server-side sessions
-- **Privacy-First**: Your data stays local, you control it
-
-## Project Structure
-
-```
-/resumind
-├── app.py                          # Main Flask application
-├── models/
-│   ├── __init__.py                 # Database instance
-│   └── user_profile.py             # ORM models
-├── services/
-│   ├── orchestration.py            # Agent coordinator
-│   └── agents/
-│       ├── company_insight_agent.py
-│       ├── experience_summarizer_agent.py
-│       └── alignment_agent.py
-├── templates/
-│   ├── base.html
-│   ├── profile_form.html           # Step 1: Profile input
-│   ├── role_form.html              # Step 2: Role targeting
-│   ├── resume_result.html          # Results display
-│   └── error.html
-├── static/
-│   └── styles.css
-├── utils.py                        # Keyword utilities
-└── requirements.txt
-```
-
-## Why Multi-Agent?
-
-Traditional resume builders use templates or single AI prompts. Resumind's multi-agent approach provides:
-
-1. **Specialization**: Each agent focuses on one task it does extremely well
-2. **Better Analysis**: Company preferences are analyzed separately from experience summarization
-3. **Explainability**: See what each agent detected and decided
-4. **Reliability**: If one agent fails, others continue; fallback mode ensures results
-5. **Quality**: Multiple passes of refinement produce superior resumes
-
-## Next Steps
-
-Potential enhancements:
-
-- **User Authentication**: Multi-user support with login
-- **Resume History**: View and compare previous tailored resumes
-- **Template Selection**: Multiple resume formats and styles
-- **PDF Export**: Direct PDF generation (currently print to PDF)
-- **Company Database**: Pre-populated company preference knowledge
-- **Resume Scoring**: ATS compatibility score with improvement suggestions
-- **A/B Testing**: Track which resume versions get interviews
-- **LinkedIn Import**: Auto-populate profile from LinkedIn
-- **Cover Letter Generation**: Additional agent for cover letters
-- **Real-time Collaboration**: Share resumes with mentors/friends
-
-## Privacy
-
-Your professional profile and resume data are stored locally in the SQLite database. No information is sent to external services except OpenAI API calls for AI-powered generation (which can be disabled by running in fallback mode).
-
-## Running Locally (After Download)
+## 📦 Installation & Setup
 
 ### 1. Install Dependencies
 
@@ -202,7 +89,7 @@ Your professional profile and resume data are stored locally in the SQLite datab
 pip install -r requirements.txt
 ```
 
-### 2. Set Up Environment Variables
+### 2. Configure OpenAI (Optional)
 
 Create a `.env` file in the root directory:
 
@@ -212,7 +99,7 @@ cp .env.example .env
 
 Edit `.env` and add your OpenAI API key:
 
-```
+```env
 OPENAI_API_KEY=sk-your-actual-api-key-here
 SESSION_SECRET=your-random-secret-key
 ```
@@ -221,8 +108,10 @@ SESSION_SECRET=your-random-secret-key
 1. Go to https://platform.openai.com/api-keys
 2. Sign in or create an account
 3. Click "Create new secret key"
-4. Copy the key (starts with "sk-...")
+4. Copy the key (starts with `sk-...`)
 5. Paste it into your `.env` file
+
+**Note:** The OpenAI API key is **optional**. Without it, ResuMind uses a robust regex-based fallback parser that works great for most resumes.
 
 ### 3. Run the Application
 
@@ -232,8 +121,125 @@ python app.py
 
 The app will start on `http://0.0.0.0:5000`
 
-**Note:** The OpenAI API key is optional. If you don't provide it, the app will use the fallback regex-based parser which still works great for most resumes!
+---
 
-## License
+## 📁 Project Structure
 
-Built with ❤️ for job seekers everywhere.
+```
+resumind/
+├── app.py                          # Main Flask application
+├── models/
+│   ├── __init__.py                 # Database instance
+│   └── user_profile.py             # User, Education, Experience, Skills, Projects
+├── services/
+│   ├── orchestration.py            # Multi-agent coordinator
+│   └── agents/                     # Six specialist agents
+│       ├── resume_parser_agent.py
+│       ├── job_description_analyzer_agent.py
+│       ├── content_optimizer_agent.py
+│       ├── ats_match_scoring_agent.py
+│       ├── proofreading_quality_agent.py
+│       └── role_calibration_agent.py
+├── templates/                      # HTML templates
+├── static/                         # CSS and assets
+└── requirements.txt
+```
+
+---
+
+## 🧪 Lessons Learned (First Agentic AI Experiment)
+
+This project was my first experiment using Replit and Agentic AI. Here are the key takeaways:
+
+### 1. **Start Simple — Multi-Agent Systems Are Hard**
+Building multiple agents from the start was much harder than expected. If I were to do it again, I'd perfect each agent individually (reader → extractor → aligner) before layering in orchestration.
+
+### 2. **Less Abstraction, More Control**
+Higher-level frameworks are convenient, but dropping down a level (custom orchestration) gives you control over how agents communicate and share context.
+
+### 3. **Prompt Engineering Is Everything**
+Small changes in phrasing or instruction structure drastically improve coherence, formatting, and accuracy.
+
+### 4. **Pay for OpenAI Credits** 😅
+Limited access = limited debugging ability. Without sufficient tokens, it's hard to test complex agent interactions.
+
+### 5. **State and Memory Management Are Crucial**
+Multi-agent systems break easily without clear shared memory or context handoff. Even a lightweight state layer helps maintain continuity.
+
+### 6. **Orchestration Is the Real Product**
+The "glue"—sequencing, error handling, feedback loops—matters more than the agents themselves. Success comes from building a reliable orchestrator.
+
+### 7. **Evaluation and Ground Truth Matter**
+It's difficult to tell if an agent succeeded without metrics. Future iterations should have structured benchmarks before spending time on prompt tuning.
+
+### 8. **Cost and Context Optimization**
+Combining resumes, job descriptions, and reasoning prompts quickly blows up token counts. Smaller, modular prompts and cached embeddings make this cheaper and faster.
+
+### 9. **UI ≠ Workflow**
+Designing the UI first exposed a sync problem—the backend logic and agent flow need to be stable before connecting to the front end.
+
+### 10. **Privacy and Data Handling**
+Since this involves personal resumes and job data, build with data privacy and local storage in mind. Logs and caches can unintentionally expose sensitive info.
+
+### 11. **Reliability > Intelligence**
+The first goal isn't to make the smartest agent—it's to make the most dependable one. Perfecting one agent before chaining many is the real foundation for autonomous AI systems.
+
+---
+
+## 🔮 Next Steps (Roadmap)
+
+### Phase 1: Modularization & Testing
+- ✅ Break the monolith into smaller, testable agents
+- ✅ Implement upload-first workflow with auto-parsing
+- 🔄 Add evaluation metrics for each agent (skill extraction accuracy, keyword comprehension, alignment quality)
+
+### Phase 2: Advanced Orchestration
+- Introduce a **Central Workflow Orchestrator** with self-correction when outputs conflict
+- Add **structured memory layer** (Redis or vector database) to cache embeddings and retain context
+- Implement **RAG (Retrieval-Augmented Generation)** with real anonymized resumes and company culture data
+
+### Phase 3: Intelligent Iteration
+- Build **prompt iteration framework** to rapidly test and compare variants
+- Expand UI into **guided conversation** ("Can you describe your leadership outcome in that project?")
+- Add **"view what the AI saw"** feature for transparency
+
+### Phase 4: Self-Improving Agents
+- Let the orchestrator **learn from results** (Resume A got an interview, B didn't → update scoring heuristics)
+- Track which resume versions get interviews
+- Implement A/B testing for continuous improvement
+
+### Phase 5: Production MVP
+- Deploy to **Vercel or AWS Lambda + RDS (Postgres)**
+- Add **user authentication** for resume history
+- Connect **analytics dashboard** to measure engagement and success rates
+- Implement **PDF export** (currently print to PDF)
+- Add **LinkedIn import** to auto-populate profiles
+
+---
+
+## 🔒 Privacy & Security
+
+- **HTML Sanitization:** All user and AI-generated content is sanitized before storage
+- **SQL Injection Protection:** Parameterized queries via SQLAlchemy ORM
+- **Local Storage:** Your resume data stays in your SQLite database
+- **No External Tracking:** Only OpenAI API calls when AI is enabled (can be disabled)
+
+---
+
+## 🤝 Contributing
+
+This is a personal experiment, but ideas and feedback are welcome! Feel free to fork and adapt for your own use.
+
+---
+
+## 📄 License
+
+For personal use. Built for job seekers everywhere.
+
+---
+
+<div align="center">
+
+**ResuMind** – *Where intelligence meets opportunity*
+
+</div>
