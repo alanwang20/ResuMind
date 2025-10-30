@@ -188,8 +188,12 @@ def upload_and_create_profile():
         db.session.add(user_profile)
         db.session.flush()  # Get the ID
         
-        # Add education entries
+        # Add education entries (only if they have required fields)
         for edu in parsed_data.get('education', []):
+            # Skip empty education entries
+            if not edu.get('degree') and not edu.get('institution'):
+                continue
+                
             education = Education(
                 profile_id=user_profile.id,
                 degree=sanitize_html(edu.get('degree', '')),
@@ -202,8 +206,12 @@ def upload_and_create_profile():
             )
             db.session.add(education)
         
-        # Add experience entries
+        # Add experience entries (only if they have required fields)
         for exp in parsed_data.get('experience', []):
+            # Skip empty experience entries
+            if not exp.get('title') and not exp.get('company'):
+                continue
+                
             experience = Experience(
                 profile_id=user_profile.id,
                 title=sanitize_html(exp.get('title', '')),
