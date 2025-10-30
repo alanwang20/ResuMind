@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Step 1: Your Profile Information</h2>
+    <p class="subtitle">Enter your complete profile information below. This will be used to match you with job opportunities.</p>
+    
+    {% if error %}
+    <div class="error-message">{{ error }}</div>
+    {% endif %}
+</div>
+
+<form method="POST" action="/profile" id="profileForm">
+    <div class="card">
+        <h3>Personal Information</h3>
+        <div class="form-group">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="grid">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+        </div>
+        <div class="grid">
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" placeholder="City, State">
+            </div>
+            <div class="form-group">
+                <label for="linkedin">LinkedIn URL</label>
+                <input type="url" id="linkedin" name="linkedin">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="summary">Professional Summary</label>
+            <textarea id="summary" name="summary" rows="4" placeholder="Brief overview of your professional background..."></textarea>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Education</h3>
+        <div id="education-container">
+            <div class="education-entry">
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Degree *</label>
+                        <input type="text" name="education_degree" placeholder="e.g., Bachelor of Science">
+                    </div>
+                    <div class="form-group">
+                        <label>Field of Study</label>
+                        <input type="text" name="education_field" placeholder="e.g., Computer Science">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Institution</label>
+                    <input type="text" name="education_institution" placeholder="University name">
+                </div>
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="text" name="education_start" placeholder="e.g., Sep 2018">
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="text" name="education_end" placeholder="e.g., May 2022">
+                    </div>
+                    <div class="form-group">
+                        <label>GPA (optional)</label>
+                        <input type="text" name="education_gpa" placeholder="e.g., 3.8/4.0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Achievements/Honors</label>
+                    <textarea name="education_achievements" rows="2" placeholder="Dean's List, Scholarships, etc."></textarea>
+                </div>
+            </div>
+        </div>
+        <button type="button" onclick="addEducation()" class="btn-secondary">+ Add Another Education</button>
+    </div>
+
+    <div class="card">
+        <h3>Work Experience</h3>
+        <div id="experience-container">
+            <div class="experience-entry">
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Job Title *</label>
+                        <input type="text" name="experience_title" placeholder="e.g., Software Engineer">
+                    </div>
+                    <div class="form-group">
+                        <label>Company</label>
+                        <input type="text" name="experience_company" placeholder="Company name">
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" name="experience_location" placeholder="City, State">
+                    </div>
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="text" name="experience_start" placeholder="e.g., Jan 2022">
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="text" name="experience_end" placeholder="e.g., Present">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="experience_description" rows="3" placeholder="Brief description of your role..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Key Achievements (one per line)</label>
+                    <textarea name="experience_achievements" rows="4" placeholder="- Led team of 5 engineers&#10;- Increased performance by 40%&#10;- Deployed system to 1M+ users"></textarea>
+                </div>
+            </div>
+        </div>
+        <button type="button" onclick="addExperience()" class="btn-secondary">+ Add Another Experience</button>
+    </div>
+
+    <div class="card">
+        <h3>Skills</h3>
+        <div id="skills-container">
+            <div class="skill-entry grid">
+                <div class="form-group">
+                    <label>Skill Name</label>
+                    <input type="text" name="skill_name" placeholder="e.g., Python">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" name="skill_category" placeholder="e.g., Programming Languages">
+                </div>
+                <div class="form-group">
+                    <label>Proficiency</label>
+                    <select name="skill_proficiency">
+                        <option value="">Select...</option>
+                        <option value="Expert">Expert</option>
+                        <option value="Advanced">Advanced</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Beginner">Beginner</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <button type="button" onclick="addSkill()" class="btn-secondary">+ Add Another Skill</button>
+    </div>
+
+    <div class="card">
+        <h3>Projects (Optional)</h3>
+        <div id="projects-container">
+            <div class="project-entry">
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" name="project_name" placeholder="e.g., E-commerce Platform">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="project_description" rows="3" placeholder="What did you build?"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Technologies Used</label>
+                    <input type="text" name="project_technologies" placeholder="e.g., React, Node.js, MongoDB">
+                </div>
+                <div class="form-group">
+                    <label>Project URL (optional)</label>
+                    <input type="url" name="project_url" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>Key Achievements</label>
+                    <textarea name="project_achievements" rows="2" placeholder="What was the impact?"></textarea>
+                </div>
+            </div>
+        </div>
+        <button type="button" onclick="addProject()" class="btn-secondary">+ Add Another Project</button>
+    </div>
+
+    <div class="card">
+        <button type="submit" class="btn-primary">Next: Enter Role Information →</button>
+    </div>
+</form>
+
+<script>
+function addEducation() {
+    const container = document.getElementById('education-container');
+    const template = container.querySelector('.education-entry').cloneNode(true);
+    template.querySelectorAll('input, textarea').forEach(el => el.value = '');
+    container.appendChild(template);
+}
+
+function addExperience() {
+    const container = document.getElementById('experience-container');
+    const template = container.querySelector('.experience-entry').cloneNode(true);
+    template.querySelectorAll('input, textarea').forEach(el => el.value = '');
+    container.appendChild(template);
+}
+
+function addSkill() {
+    const container = document.getElementById('skills-container');
+    const template = container.querySelector('.skill-entry').cloneNode(true);
+    template.querySelectorAll('input, select').forEach(el => el.value = '');
+    container.appendChild(template);
+}
+
+function addProject() {
+    const container = document.getElementById('projects-container');
+    const template = container.querySelector('.project-entry').cloneNode(true);
+    template.querySelectorAll('input, textarea').forEach(el => el.value = '');
+    container.appendChild(template);
+}
+</script>
+{% endblock %}

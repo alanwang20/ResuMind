@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Step 2: Target Role Information</h2>
+    <p class="subtitle">Enter details about the role you're applying for. Our AI agents will analyze the company and tailor your resume.</p>
+    <p class="info-text">Profile saved for: <strong>{{ profile.name }}</strong></p>
+</div>
+
+<form method="POST" action="/generate_resume">
+    <input type="hidden" name="session_id" value="{{ session_id }}">
+    
+    <div class="card">
+        <h3>Company & Role Details</h3>
+        <div class="grid">
+            <div class="form-group">
+                <label for="company_name">Company Name *</label>
+                <input type="text" id="company_name" name="company_name" required placeholder="e.g., Google, Microsoft, Acme Corp">
+            </div>
+            <div class="form-group">
+                <label for="role_title">Role Title *</label>
+                <input type="text" id="role_title" name="role_title" required placeholder="e.g., Senior Software Engineer">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="job_description">Job Description *</label>
+            <textarea id="job_description" name="job_description" rows="12" required 
+                      placeholder="Paste the complete job description here..."></textarea>
+            <small>Include requirements, responsibilities, qualifications, and any other details from the posting.</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="company_info">Additional Company Information (Optional)</label>
+            <textarea id="company_info" name="company_info" rows="6" 
+                      placeholder="Any additional information about the company culture, values, or preferences..."></textarea>
+            <small>This helps our AI understand company-specific resume preferences (e.g., "Big tech company that values concise bullet points").</small>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="agent-info">
+            <h4>🤖 Our Multi-Agent System Will:</h4>
+            <ul>
+                <li><strong>Agent 1:</strong> Analyze company-specific resume preferences and extract key requirements</li>
+                <li><strong>Agent 2:</strong> Summarize your experiences into achievement-focused statements</li>
+                <li><strong>Agent 3:</strong> Match and tailor your experiences to this specific role with relevant keywords</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card">
+        <button type="submit" class="btn-primary">Generate Tailored Resume 🚀</button>
+        <a href="/" class="btn-secondary" style="margin-left: 1rem;">← Start Over</a>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>✨ Your Tailored Resume</h2>
+    <p class="subtitle">Generated for <strong>{{ role.role_title }}</strong> at <strong>{{ role.company_name }}</strong></p>
+</div>
+
+{% if result.get('success') %}
+<div class="result-grid">
+    <div>
+        <div class="resume-preview">
+            <div class="print-hint">
+                💡 Use your browser's Print function (Ctrl/Cmd + P) and select "Save as PDF" to export.
+            </div>
+            {{ result.aligned_resume.resume_html | safe }}
+        </div>
+        <div class="download-links">
+            <a href="/download/resume/{{ submission_id }}" class="download-link">📥 Download Resume.md</a>
+        </div>
+    </div>
+
+    <div>
+        <div class="ats-section">
+            <h3>🎯 Keyword Coverage Analysis</h3>
+            <p>Important keywords from the job posting that appear in your tailored resume:</p>
+            
+            {% if result.aligned_resume.keyword_coverage.covered %}
+            <h4>Covered Keywords ({{ result.aligned_resume.keyword_coverage.covered | length }})</h4>
+            <div class="keyword-tags">
+                {% for keyword in result.aligned_resume.keyword_coverage.covered[:20] %}
+                <span class="keyword-tag covered">{{ keyword }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if result.aligned_resume.keyword_coverage.emphasized %}
+            <h4 style="margin-top: 1.5rem;">Emphasized Keywords</h4>
+            <div class="keyword-tags">
+                {% for keyword in result.aligned_resume.keyword_coverage.emphasized[:10] %}
+                <span class="keyword-tag emphasized">{{ keyword }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="ats-section">
+            <h3>🤖 Agent Insights</h3>
+            
+            <div class="agent-insight">
+                <h4>Company Preferences Detected:</h4>
+                {% if result.company_insights.company_preferences %}
+                <ul>
+                    <li><strong>Resume Format:</strong> {{ result.company_insights.company_preferences.resume_format }}</li>
+                    <li><strong>Bullet Style:</strong> {{ result.company_insights.company_preferences.bullet_style }}</li>
+                    <li><strong>Tone:</strong> {{ result.company_insights.company_preferences.tone }}</li>
+                </ul>
+                {% else %}
+                <p>Standard professional format applied.</p>
+                {% endif %}
+            </div>
+
+            {% if result.aligned_resume.tailoring_notes %}
+            <div class="agent-insight">
+                <h4>Tailoring Applied:</h4>
+                <ul>
+                    {% for note in result.aligned_resume.tailoring_notes[:5] %}
+                    <li>{{ note }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h4>Next Steps</h4>
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 0.5rem;">✅ Review and customize the resume</li>
+                <li style="margin-bottom: 0.5rem;">✅ Download as Markdown for editing</li>
+                <li style="margin-bottom: 0.5rem;">✅ Export to PDF using print function</li>
+                <li>✅ Apply with confidence!</li>
+            </ul>
+            <a href="/role/{{ session_id }}" class="btn-secondary" style="margin-top: 1rem;">Generate for Another Role</a>
+            <a href="/" class="btn-secondary" style="margin-left: 0.5rem;">New Profile</a>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="error-message">
+    <strong>Generation Error:</strong> {{ result.get('error', 'Unknown error occurred') }}
+</div>
+<div class="card">
+    <a href="/role/{{ session_id }}" class="btn-primary">Try Again</a>
+</div>
+{% endif %}
+{% endblock %}
