@@ -1,13 +1,15 @@
 import os
 import uuid
 import logging
-from flask import Flask, render_template, request, redirect, url_for, session, Response
+from flask import Flask, render_template, request, redirect, url_for, session, Response, jsonify
 import json
 import bleach
+from werkzeug.utils import secure_filename
 
 from models import db
 from models.user_profile import UserProfile, Education, Experience, Skill, Project, RoleSubmission
 from services.orchestration import ResumeOrchestrator
+from services.agents.resume_parser_agent import ResumeParserAgent
 
 ALLOWED_TAGS = [
     'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
@@ -50,10 +52,86 @@ db.init_app(app)
 openai_available = os.environ.get('OPENAI_API_KEY') or os.environ.get('OPENAI_BASE_URL')
 orchestrator = ResumeOrchestrator(use_openai=bool(openai_available))
 
+if openai_available:
+    from openai import OpenAI
+    openai_client = OpenAI()
+    resume_parser = ResumeParserAgent(openai_client=openai_client)
+else:
+    resume_parser = ResumeParserAgent(openai_client=None)
+
 
 with app.app_context():
     db.create_all()
     logger.info("Database tables created")
+
+
+def extract_text_from_file(file):
+    """Extract text content from uploaded file (PDF, DOCX, or TXT)."""
+    import io
+    
+    filename = secure_filename(file.filename)
+    file_ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+    
+    try:
+        if file_ext == 'txt':
+            return file.read().decode('utf-8', errors='ignore')
+        
+        elif file_ext == 'pdf':
+            import PyPDF2
+            pdf_reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
+            text = []
+            for page in pdf_reader.pages:
+                text.append(page.extract_text())
+            return '\n'.join(text)
+        
+        elif file_ext in ['docx', 'doc']:
+            from docx import Document
+            doc = Document(io.BytesIO(file.read()))
+            text = []
+            for paragraph in doc.paragraphs:
+                text.append(paragraph.text)
+            return '\n'.join(text)
+        
+        else:
+            raise ValueError(f"Unsupported file type: {file_ext}")
+    
+    except Exception as e:
+        logger.error(f"Error extracting text from {filename}: {e}", exc_info=True)
+        raise
+
+
+@app.route('/parse_resume', methods=['POST'])
+def parse_resume():
+    """Parse uploaded resume and extract structured information."""
+    try:
+        if 'resume' not in request.files:
+            return jsonify({'error': 'No file uploaded'}), 400
+        
+        file = request.files['resume']
+        
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        logger.info(f"Parsing resume file: {file.filename}")
+        
+        resume_text = extract_text_from_file(file)
+        
+        if not resume_text or len(resume_text.strip()) < 50:
+            return jsonify({'error': 'Resume file appears to be empty or too short'}), 400
+        
+        logger.info(f"Extracted {len(resume_text)} characters from resume")
+        
+        parsed_data = resume_parser.parse_resume(resume_text)
+        
+        logger.info("Resume parsed successfully")
+        return jsonify(parsed_data)
+    
+    except ValueError as e:
+        logger.error(f"Value error parsing resume: {e}")
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        logger.error(f"Error parsing resume: {e}", exc_info=True)
+        return jsonify({'error': 'Failed to parse resume. Please try again or fill out the form manually.'}), 500
 
 
 @app.route('/')
