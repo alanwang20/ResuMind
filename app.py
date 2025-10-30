@@ -136,8 +136,125 @@ def parse_resume():
 
 @app.route('/')
 def index():
-    """Page 1: Profile input form."""
-    return render_template('profile_form.html')
+    """Landing page: Upload resume."""
+    return render_template('index.html')
+
+
+@app.route('/upload_and_create_profile', methods=['POST'])
+def upload_and_create_profile():
+    """Upload resume, parse it, and create profile automatically."""
+    try:
+        if 'resume' not in request.files:
+            return jsonify({'error': 'No file uploaded'}), 400
+        
+        file = request.files['resume']
+        
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        logger.info(f"Processing resume upload: {file.filename}")
+        
+        # Extract text from resume
+        resume_text = extract_text_from_file(file)
+        
+        if not resume_text or len(resume_text.strip()) < 50:
+            return jsonify({'error': 'Resume file appears to be empty or too short'}), 400
+        
+        logger.info(f"Extracted {len(resume_text)} characters from resume")
+        
+        # Parse resume with AI
+        parsed_data = resume_parser.parse_resume(resume_text)
+        logger.info("Resume parsed successfully")
+        
+        # Create user profile automatically from parsed data
+        session_id = str(uuid.uuid4())
+        
+        # Extract personal info
+        personal_info = parsed_data.get('personal_info', {})
+        
+        # Prepare profile data for database
+        profile_data = {
+            'session_id': session_id,
+            'name': sanitize_html(personal_info.get('name', 'User')),
+            'email': sanitize_html(personal_info.get('email', '')),
+            'phone': sanitize_html(personal_info.get('phone', '')),
+            'location': sanitize_html(personal_info.get('location', '')),
+            'linkedin': sanitize_html(personal_info.get('linkedin', '')),
+            'summary': sanitize_html(personal_info.get('summary', ''))
+        }
+        
+        # Create UserProfile
+        user_profile = UserProfile(**profile_data)
+        db.session.add(user_profile)
+        db.session.flush()  # Get the ID
+        
+        # Add education entries
+        for edu in parsed_data.get('education', []):
+            education = Education(
+                user_profile_id=user_profile.id,
+                degree=sanitize_html(edu.get('degree', '')),
+                field_of_study=sanitize_html(edu.get('field_of_study', '')),
+                institution=sanitize_html(edu.get('institution', '')),
+                start_date=sanitize_html(edu.get('start_date', '')),
+                end_date=sanitize_html(edu.get('end_date', '')),
+                gpa=sanitize_html(edu.get('gpa', '')),
+                achievements=sanitize_html(edu.get('achievements', ''))
+            )
+            db.session.add(education)
+        
+        # Add experience entries
+        for exp in parsed_data.get('experience', []):
+            experience = Experience(
+                user_profile_id=user_profile.id,
+                title=sanitize_html(exp.get('title', '')),
+                company=sanitize_html(exp.get('company', '')),
+                location=sanitize_html(exp.get('location', '')),
+                start_date=sanitize_html(exp.get('start_date', '')),
+                end_date=sanitize_html(exp.get('end_date', '')),
+                description=sanitize_html(exp.get('description', '')),
+                achievements=sanitize_html(exp.get('achievements', ''))
+            )
+            db.session.add(experience)
+        
+        # Add skills
+        for skill in parsed_data.get('skills', []):
+            skill_entry = Skill(
+                user_profile_id=user_profile.id,
+                name=sanitize_html(skill.get('name', skill if isinstance(skill, str) else '')),
+                category=sanitize_html(skill.get('category', '') if isinstance(skill, dict) else ''),
+                proficiency=sanitize_html(skill.get('proficiency', '') if isinstance(skill, dict) else '')
+            )
+            db.session.add(skill_entry)
+        
+        # Add projects if any
+        for proj in parsed_data.get('projects', []):
+            project = Project(
+                user_profile_id=user_profile.id,
+                name=sanitize_html(proj.get('name', '')),
+                description=sanitize_html(proj.get('description', '')),
+                technologies=sanitize_html(proj.get('technologies', '')),
+                url=sanitize_html(proj.get('url', '')),
+                achievements=sanitize_html(proj.get('achievements', ''))
+            )
+            db.session.add(project)
+        
+        db.session.commit()
+        
+        logger.info(f"Profile created successfully for session: {session_id}")
+        
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'message': 'Resume processed and profile created successfully'
+        })
+    
+    except ValueError as e:
+        logger.error(f"Value error creating profile: {e}")
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        logger.error(f"Error creating profile from resume: {e}", exc_info=True)
+        db.session.rollback()
+        return jsonify({'error': 'Failed to process resume. Please try again.'}), 500
 
 
 @app.route('/profile', methods=['POST'])

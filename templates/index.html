@@ -1,43 +1,318 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form hx-post="/generate" hx-target="#result" hx-swap="innerHTML" hx-indicator="#spinner">
-    <div class="grid">
-        <div class="card">
-            <h2>Job Description</h2>
-            <div class="form-group">
-                <label for="job_description">Paste the job description you're targeting:</label>
-                <textarea 
-                    id="job_description" 
-                    name="job_description" 
-                    placeholder="Paste the job description here..."
-                    required></textarea>
-            </div>
-        </div>
+<div class="upload-hero">
+    <div class="hero-content">
+        <h1>✨ Upload Your Resume</h1>
+        <p class="hero-subtitle">AI will extract your information and tailor it for any job posting</p>
+    </div>
 
-        <div class="card">
-            <h2>Your Experience</h2>
-            <div class="form-group">
-                <label for="user_experience">Describe your experience, projects, and skills:</label>
-                <textarea 
-                    id="user_experience" 
-                    name="user_experience" 
-                    placeholder="List your experience, projects, achievements, and skills..."
-                    required></textarea>
+    <div class="upload-card">
+        <div id="uploadZone" class="upload-zone">
+            <input type="file" id="resumeInput" accept=".pdf,.docx,.txt" hidden>
+            
+            <!-- Upload prompt -->
+            <div id="uploadPrompt">
+                <div class="upload-icon">📄</div>
+                <h3>Drop your resume here</h3>
+                <p>or click to browse</p>
+                <p class="upload-hint">Supports PDF, DOCX, or TXT files (max 25MB)</p>
             </div>
-            <div class="form-group">
-                <label for="resume_file">Or upload a text file (optional):</label>
-                <input type="file" id="resume_file" name="resume_file" accept=".txt">
+
+            <!-- Loading state -->
+            <div id="uploadLoading" style="display: none;">
+                <div class="spinner"></div>
+                <h3>Processing your resume...</h3>
+                <p>AI is extracting your profile information</p>
+            </div>
+
+            <!-- Success state -->
+            <div id="uploadSuccess" style="display: none;">
+                <div class="success-icon">✅</div>
+                <h3>Resume processed successfully!</h3>
+                <p>Redirecting to job targeting...</p>
+            </div>
+
+            <!-- Error state -->
+            <div id="uploadError" style="display: none;">
+                <div class="error-icon">❌</div>
+                <h3>Upload failed</h3>
+                <p id="errorMessage">Please try again</p>
+                <button onclick="resetUpload()" class="btn-secondary">Try Again</button>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <button type="submit" class="btn-primary">Generate Resume & Interview Prep</button>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Smart Keyword Matching</h3>
+            <p>AI extracts and integrates job-specific keywords into your resume</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Job Match Score</h3>
+            <p>Get a real-time match score for each job you apply to</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Instant Results</h3>
+            <p>Generate tailored resumes in seconds, not hours</p>
+        </div>
     </div>
-</form>
+</div>
 
-<div id="spinner" class="spinner"></div>
+<style>
+.upload-hero {
+    max-width: 900px;
+    margin: 0 auto;
+}
 
-<div id="result"></div>
+.hero-content {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.hero-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.upload-card {
+    background: white;
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    margin-bottom: 3rem;
+}
+
+.upload-zone {
+    border: 3px dashed #667eea;
+    border-radius: 12px;
+    padding: 4rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8f9ff;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-zone:hover {
+    border-color: #764ba2;
+    background: #f0f2ff;
+    transform: translateY(-2px);
+}
+
+.upload-zone.drag-over {
+    border-color: #764ba2;
+    background: #e8ebff;
+    transform: scale(1.02);
+}
+
+.upload-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+#uploadPrompt h3 {
+    margin: 1rem 0 0.5rem 0;
+    color: #333;
+}
+
+#uploadPrompt p {
+    color: #666;
+    margin: 0.5rem 0;
+}
+
+.upload-hint {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1.5rem auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.success-icon, .error-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+#uploadLoading h3, #uploadSuccess h3, #uploadError h3 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+}
+
+#uploadLoading p, #uploadSuccess p, #uploadError p {
+    color: #666;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.feature-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.feature-card p {
+    margin: 0;
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+</style>
+
+<script>
+const uploadZone = document.getElementById('uploadZone');
+const resumeInput = document.getElementById('resumeInput');
+
+// Click to upload
+uploadZone.addEventListener('click', () => {
+    resumeInput.click();
+});
+
+// File selection
+resumeInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) handleFileUpload(file);
+});
+
+// Drag and drop
+uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.classList.add('drag-over');
+});
+
+uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('drag-over');
+});
+
+uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileUpload(file);
+});
+
+async function handleFileUpload(file) {
+    // Validate file type
+    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+    if (!allowedTypes.includes(file.type)) {
+        showState('error', 'Invalid file type. Please upload PDF, DOCX, or TXT files.');
+        return;
+    }
+
+    // Validate file size (25MB)
+    if (file.size > 25 * 1024 * 1024) {
+        showState('error', 'File too large. Maximum size is 25MB.');
+        return;
+    }
+
+    showState('loading');
+
+    const formData = new FormData();
+    formData.append('resume', file);
+
+    try {
+        const response = await fetch('/upload_and_create_profile', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            showState('error', data.error || 'Failed to process resume');
+            return;
+        }
+
+        // Success - redirect to job input
+        showState('success');
+        setTimeout(() => {
+            window.location.href = `/role/${data.session_id}`;
+        }, 1500);
+
+    } catch (error) {
+        console.error('Upload error:', error);
+        showState('error', 'Network error. Please try again.');
+    }
+}
+
+function showState(state, message = '') {
+    const prompt = document.getElementById('uploadPrompt');
+    const loading = document.getElementById('uploadLoading');
+    const success = document.getElementById('uploadSuccess');
+    const error = document.getElementById('uploadError');
+    const errorMsg = document.getElementById('errorMessage');
+
+    prompt.style.display = 'none';
+    loading.style.display = 'none';
+    success.style.display = 'none';
+    error.style.display = 'none';
+
+    if (state === 'loading') {
+        loading.style.display = 'block';
+    } else if (state === 'success') {
+        success.style.display = 'block';
+    } else if (state === 'error') {
+        error.style.display = 'block';
+        errorMsg.textContent = message;
+    } else {
+        prompt.style.display = 'block';
+    }
+}
+
+function resetUpload() {
+    resumeInput.value = '';
+    showState('prompt');
+}
+</script>
 {% endblock %}
