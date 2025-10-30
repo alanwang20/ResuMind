@@ -1,0 +1,250 @@
+Title: Build “Resumind” – an agentic resume + interview prep MVP (Flask + HTMX)
+
+What to create:
+
+Create a Python/Flask web app named Resumind that lets a user:
+
+Paste a job description.
+
+Paste their experience/projects (or upload a resume text file).
+
+Click Generate to get:
+
+A tailored resume draft (HTML + Markdown download).
+
+A set of interview prep questions (behavioral + role-specific).
+
+A short ATS keyword match report (top matches + gaps).
+
+If an OPENAI_API_KEY env var is present, use the OpenAI API for generation. If not, fall back to a simple rules-based template so the app still works.
+
+Tech & UX requirements
+
+Backend: Python 3 + Flask
+
+View layer: Jinja2 + HTMX for snappy, partial updates (no heavy SPA)
+
+Styling: Minimal Tailwind-like utility CSS (hand-rolled), responsive, clean
+
+No DB for MVP; store session state in memory (Python dict) with a UUID per request
+
+File export:
+
+Resume as HTML (print-to-PDF works in browser) and Markdown (download)
+
+Interview questions as Markdown (download)
+
+Observability: Log prompt/response lengths and timing to console
+
+Privacy: Don’t persist user data; show a small notice on the page
+
+Project files to generate
+/resumind
+  ├─ app.py
+  ├─ prompts.py
+  ├─ generators.py
+  ├─ utils.py
+  ├─ requirements.txt
+  ├─ README.md
+  ├─ static/
+  │   └─ styles.css
+  └─ templates/
+      ├─ base.html
+      ├─ index.html
+      └─ partial_result.html
+
+File: requirements.txt
+
+Include exactly:
+
+flask==3.0.3
+werkzeug==3.0.3
+python-dotenv==1.0.1
+openai==1.53.0
+markdown==3.6
+
+File: app.py
+
+Create a Flask app with routes:
+
+GET / → show form: job description textarea, experience textarea, optional text file upload, and “Generate” button (hx-post to /generate).
+
+POST /generate → builds a structured payload, calls a generator (OpenAI if available, else fallback), returns partial_result.html (HTMX swap).
+
+GET /download/<kind>/<session_id> → serves generated markdown (resume or questions).
+
+Use content limits (e.g., 20k chars per field), basic input sanitization, and a simple session_id (uuid4). Add small helper to truncate logs.
+
+Implement a tiny “ATS keyword match” by extracting top n-grams (1–2 grams) from the job description and counting matches in the user experience.
+
+Respect OPENAI_API_KEY via environment. If missing, log a warning and use fallback.
+
+File: generators.py
+
+Provide:
+
+generate_with_openai(payload) -> dict
+
+Uses OpenAI Chat Completions (gpt-4.1-mini or similar) with system and user prompts (from prompts.py).
+
+Returns dict with keys: resume_html, resume_md, questions_md, ats_report.
+
+generate_fallback(payload) -> dict
+
+Deterministic heuristic: extract keywords, map to bullets, build a simple styled HTML resume + MD version, and questions in MD.
+
+File: prompts.py
+
+Provide two multi-part prompt templates:
+
+RESUME_PROMPT: Instructs the model to:
+
+Tailor bullets to the JD, prioritize measurable impact, mirror relevant terminology w/out keyword stuffing, and choose a clean one-page structure with role-appropriate sections.
+
+Output both: (A) HTML (semantic, class hooks only), (B) Markdown (bulleted sections).
+
+QUESTIONS_PROMPT: Instructs the model to:
+
+Produce 10 questions: 4 behavioral (STAR-friendly), 4 role-specific technical, 2 team/org fit.
+
+For each Q, include a one-line coaching tip.
+
+Output Markdown only.
+
+Make prompts explicit about no private data and keep total tokens reasonable.
+
+File: utils.py
+
+simple_ats_report(job_text, user_text, top_k=20) -> dict
+Extract 1–2gram keywords from job_text (stopwords removed), score presence in user_text, and return:
+{ "top_matches": [(kw, count)], "top_gaps": [kw, ...] }.
+
+safe_markdown_download(content, filename) helper
+
+Small clean_text and top_ngrams helpers
+
+File: static/styles.css
+
+Light, modern utilities (stack: Inter, max-width container, cards, buttons, inputs, a few spacing/color utilities). Keep it under ~200 lines.
+
+File: templates/base.html
+
+A minimal layout with:
+
+Header: Resumind and a tiny subtitle “Agentic resumes + interview prep”
+
+Main container + {% block content %}
+
+Footer with privacy note (“Your inputs are processed in memory and not stored on the server in this MVP.”)
+
+File: templates/index.html
+
+Two side-by-side cards (stack on mobile):
+
+Job Description textarea
+
+Experience / Projects textarea + optional file upload (accept .txt)
+
+“Generate” button using HTMX:
+
+<button 
+  hx-post="/generate" 
+  hx-target="#result" 
+  hx-swap="innerHTML"
+  class="btn-primary">Generate</button>
+
+
+A <div id="result"></div> placeholder for partial_result.html.
+
+File: templates/partial_result.html
+
+Left column: Resume Preview (HTML) in a printable card + a “Print / Save as PDF” hint.
+
+Right column: Interview Questions (Markdown rendered) and ATS Match Report (top matches vs gaps).
+
+Two small download links:
+
+“Download Resume.md” → /download/resume/{{ session_id }}
+
+“Download Questions.md” → /download/questions/{{ session_id }}
+
+File: README.md
+
+Include:
+
+Setup
+
+Add a Replit Secret: OPENAI_API_KEY (optional).
+
+pip install -r requirements.txt
+
+python app.py
+
+Notes
+
+If no API key is set, fallback generator will run (deterministic).
+
+To export PDF, use your browser’s Print → Save as PDF on the Resume preview.
+
+Next steps
+
+Add RAG over a corpus of high-performing resumes (opt-in user data).
+
+Add template A/B tests + outcome logging (“got interview?”) to improve prompts.
+
+Add auth + persistence (Postgres) and a simple scoring dashboard.
+
+Implementation details & guardrails
+
+OpenAI usage (generators.py):
+
+from openai import OpenAI
+client = OpenAI()
+resp = client.chat.completions.create(
+    model="gpt-4.1-mini",
+    messages=[{"role":"system","content": RESUME_SYSTEM},
+              {"role":"user","content": build_resume_user_payload(payload)}],
+    temperature=0.4
+)
+
+
+Parse the model’s response into HTML and Markdown blocks reliably by asking it to wrap them in clear markers like:
+
+<RESUME_HTML> ... </RESUME_HTML>
+<RESUME_MD> ... </RESUME_MD>
+
+
+For questions:
+
+<QUESTIONS_MD> ... </QUESTIONS_MD>
+
+
+Fallback generation:
+
+Build a concise one-page HTML resume with sections: Header (name placeholder “Your Name”), Summary (synthesized from top keywords), Experience (bulletize achievements from user text; prepend action verbs; add faux metrics if present), Skills (top matched keywords), Education (placeholder).
+
+Create MD equivalents.
+
+HTMX flow:
+
+hx-post="/generate" returns partial_result.html with resume preview and downloads.
+
+Show a small spinner state on the button (hx-indicator).
+
+Safety/Privacy copy:
+
+“This MVP does not store your data. Clear the page to remove your content.”
+
+Acceptance criteria
+
+App loads on Replit, generates usable outputs with or without an OpenAI key.
+
+Resume HTML is clean/printable; MD downloads work.
+
+Interview questions are clearly formatted and useful.
+
+ATS report shows at least 10 “matches” and up to 10 “gaps.”
+
+No crashes on long inputs up to ~15k chars each field.
+
+If anything’s unclear, default to sensible, production-ish patterns. Keep code tidy and commented.
