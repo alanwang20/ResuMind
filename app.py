@@ -60,9 +60,26 @@ else:
     resume_parser = ResumeParserAgent(openai_client=None)
 
 
-with app.app_context():
+# Ensure models are loaded before creating tables
+def init_database():
+    """Initialize database and create all tables."""
+    # Import models to ensure they are registered
+    from models.user_profile import UserProfile, Education, Experience, Skill, Project, RoleSubmission
+    
+    # Debug: Log database URI
+    logger.info(f"Database URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
+    
+    # Create all tables
     db.create_all()
-    logger.info("Database tables created")
+    
+    # Verify tables were created
+    from sqlalchemy import inspect
+    inspector = inspect(db.engine)
+    tables = inspector.get_table_names()
+    logger.info(f"Database tables created: {tables}")
+
+with app.app_context():
+    init_database()
 
 
 def extract_text_from_file(file):
