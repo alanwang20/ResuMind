@@ -187,7 +187,14 @@ class ResumeOrchestrator:
         skills = []
         if profile_data.get('skills'):
             skills_data = json.loads(profile_data['skills']) if isinstance(profile_data['skills'], str) else profile_data['skills']
-            skills = skills_data if isinstance(skills_data, list) else []
+            if isinstance(skills_data, list):
+                # Extract skill names from dictionaries if needed
+                skills = [
+                    skill['name'] if isinstance(skill, dict) else str(skill)
+                    for skill in skills_data
+                ]
+            else:
+                skills = []
         
         return {
             'summary': profile_data.get('summary', ''),
@@ -232,7 +239,14 @@ class ResumeOrchestrator:
         if not optimized_skills:
             if profile_data.get('skills'):
                 skills_data = json.loads(profile_data['skills']) if isinstance(profile_data['skills'], str) else profile_data['skills']
-                optimized_skills = skills_data if isinstance(skills_data, list) else []
+                if isinstance(skills_data, list):
+                    # Extract skill names from dictionaries if needed
+                    optimized_skills = [
+                        skill['name'] if isinstance(skill, dict) else str(skill)
+                        for skill in skills_data
+                    ]
+                else:
+                    optimized_skills = []
         
         # Generate HTML resume
         resume_html = self._build_resume_html(
