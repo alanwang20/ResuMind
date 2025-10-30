@@ -38,7 +38,7 @@ class UserProfile(db.Model):
             'website': self.website,
             'summary': self.summary,
             'education': [edu.to_dict() for edu in self.education],
-            'experiences': [exp.to_dict() for exp in self.experiences],
+            'experience': [exp.to_dict() for exp in self.experiences],
             'skills': [skill.to_dict() for skill in self.skills],
             'projects': [proj.to_dict() for proj in self.projects]
         }
@@ -62,12 +62,23 @@ class Education(db.Model):
     profile = db.relationship('UserProfile', back_populates='education')
     
     def to_dict(self):
+        # Format dates for display
+        year = ''
+        if self.start_date and self.end_date:
+            year = f"{self.start_date} - {self.end_date}"
+        elif self.start_date:
+            year = self.start_date
+        elif self.end_date:
+            year = self.end_date
+            
         return {
             'id': self.id,
             'degree': self.degree,
             'field_of_study': self.field_of_study,
+            'school': self.institution,  # Map to expected field name
             'institution': self.institution,
             'location': self.location,
+            'year': year,  # Combined date display
             'start_date': self.start_date,
             'end_date': self.end_date,
             'gpa': self.gpa,
@@ -93,16 +104,39 @@ class Experience(db.Model):
     profile = db.relationship('UserProfile', back_populates='experiences')
     
     def to_dict(self):
+        # Format dates for display
+        dates = ''
+        if self.current:
+            dates = f"{self.start_date} - Present" if self.start_date else "Present"
+        elif self.start_date and self.end_date:
+            dates = f"{self.start_date} - {self.end_date}"
+        elif self.start_date:
+            dates = self.start_date
+        elif self.end_date:
+            dates = self.end_date
+        
+        # Combine description and achievements into bullets
+        bullets = []
+        if self.description:
+            # Split by newlines or bullet points
+            desc_bullets = [line.strip() for line in self.description.split('\n') if line.strip()]
+            bullets.extend(desc_bullets)
+        if self.achievements:
+            ach_bullets = [line.strip() for line in self.achievements.split('\n') if line.strip()]
+            bullets.extend(ach_bullets)
+            
         return {
             'id': self.id,
             'title': self.title,
             'company': self.company,
             'location': self.location,
+            'dates': dates,  # Combined date display
             'start_date': self.start_date,
             'end_date': self.end_date,
             'current': self.current,
             'description': self.description,
-            'achievements': self.achievements
+            'achievements': self.achievements,
+            'bullets': bullets  # Formatted bullet points
         }
 
 
