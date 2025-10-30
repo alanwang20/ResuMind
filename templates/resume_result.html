@@ -7,13 +7,57 @@
 </div>
 
 {% if result.get('success') %}
+<!-- Huntr-style Job Match Score Card -->
+<div class="match-score-card">
+    <div class="match-score-header">
+        <h2>🎯 Job Match Score</h2>
+        <div class="score-circle">
+            <span class="score-number">{{ result.match_score.overall_match_score or 0 }}</span>
+            <span class="score-label">/100</span>
+        </div>
+    </div>
+    <p class="match-summary">{{ result.match_score.summary or "Your resume has been optimized for this position." }}</p>
+    
+    <!-- Score Breakdown -->
+    <div class="score-breakdown">
+        <div class="score-item">
+            <span class="score-label-small">Keywords</span>
+            <div class="score-bar">
+                <div class="score-fill" style="width: {{ result.match_score.score_breakdown.keyword_match.score or 0 }}%"></div>
+            </div>
+            <span class="score-value">{{ result.match_score.score_breakdown.keyword_match.score or 0 }}%</span>
+        </div>
+        <div class="score-item">
+            <span class="score-label-small">Qualifications</span>
+            <div class="score-bar">
+                <div class="score-fill" style="width: {{ result.match_score.score_breakdown.qualifications_fit.score or 0 }}%"></div>
+            </div>
+            <span class="score-value">{{ result.match_score.score_breakdown.qualifications_fit.score or 0 }}%</span>
+        </div>
+        <div class="score-item">
+            <span class="score-label-small">ATS Compliance</span>
+            <div class="score-bar">
+                <div class="score-fill" style="width: {{ result.match_score.score_breakdown.ats_compliance.score or 0 }}%"></div>
+            </div>
+            <span class="score-value">{{ result.match_score.score_breakdown.ats_compliance.score or 0 }}%</span>
+        </div>
+        <div class="score-item">
+            <span class="score-label-small">Semantic Match</span>
+            <div class="score-bar">
+                <div class="score-fill" style="width: {{ result.match_score.score_breakdown.semantic_match.score or 0 }}%"></div>
+            </div>
+            <span class="score-value">{{ result.match_score.score_breakdown.semantic_match.score or 0 }}%</span>
+        </div>
+    </div>
+</div>
+
 <div class="result-grid">
     <div>
         <div class="resume-preview">
             <div class="print-hint">
                 💡 Use your browser's Print function (Ctrl/Cmd + P) and select "Save as PDF" to export.
             </div>
-            {{ result.aligned_resume.resume_html | safe }}
+            {{ result.final_resume.resume_html | safe }}
         </div>
         <div class="download-links">
             <a href="/download/resume/{{ submission_id }}" class="download-link">📥 Download Resume.md</a>
@@ -21,61 +65,163 @@
     </div>
 
     <div>
+        <!-- Quality Review Section (Huntr-style) -->
+        {% if result.quality_review.quality_score %}
         <div class="ats-section">
-            <h3>🎯 Keyword Coverage Analysis</h3>
-            <p>Important keywords from the job posting that appear in your tailored resume:</p>
-            
-            {% if result.aligned_resume.keyword_coverage.covered %}
-            <h4>Covered Keywords ({{ result.aligned_resume.keyword_coverage.covered | length }})</h4>
-            <div class="keyword-tags">
-                {% for keyword in result.aligned_resume.keyword_coverage.covered[:20] %}
-                <span class="keyword-tag covered">{{ keyword }}</span>
-                {% endfor %}
+            <h3>📋 Quality Review</h3>
+            <div class="quality-scores">
+                <div class="quality-metric">
+                    <span class="metric-label">Overall Quality</span>
+                    <span class="metric-score">{{ result.quality_review.quality_score.overall }}/100</span>
+                </div>
+                <div class="quality-metric">
+                    <span class="metric-label">Impact Metrics</span>
+                    <span class="metric-score">{{ result.quality_review.quality_score.metrics }}/100</span>
+                </div>
+                <div class="quality-metric">
+                    <span class="metric-label">Content Quality</span>
+                    <span class="metric-score">{{ result.quality_review.quality_score.content }}/100</span>
+                </div>
             </div>
-            {% endif %}
             
-            {% if result.aligned_resume.keyword_coverage.emphasized %}
-            <h4 style="margin-top: 1.5rem;">Emphasized Keywords</h4>
-            <div class="keyword-tags">
-                {% for keyword in result.aligned_resume.keyword_coverage.emphasized[:10] %}
-                <span class="keyword-tag emphasized">{{ keyword }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="ats-section">
-            <h3>🤖 Agent Insights</h3>
-            
-            <div class="agent-insight">
-                <h4>Company Preferences Detected:</h4>
-                {% if result.company_insights.company_preferences %}
+            {% if result.quality_review.missing_metrics %}
+            <div class="quality-issues">
+                <h4>⚠️ Missing Metrics ({{ result.quality_review.missing_metrics | length }})</h4>
                 <ul>
-                    <li><strong>Resume Format:</strong> {{ result.company_insights.company_preferences.resume_format }}</li>
-                    <li><strong>Bullet Style:</strong> {{ result.company_insights.company_preferences.bullet_style }}</li>
-                    <li><strong>Tone:</strong> {{ result.company_insights.company_preferences.tone }}</li>
+                    {% for issue in result.quality_review.missing_metrics[:3] %}
+                    <li>
+                        <strong>{{ issue.bullet[:80] }}...</strong><br>
+                        <small>{{ issue.suggestion }}</small>
+                    </li>
+                    {% endfor %}
                 </ul>
-                {% else %}
-                <p>Standard professional format applied.</p>
-                {% endif %}
             </div>
-
-            {% if result.aligned_resume.tailoring_notes %}
-            <div class="agent-insight">
-                <h4>Tailoring Applied:</h4>
+            {% endif %}
+            
+            {% if result.quality_review.cliches %}
+            <div class="quality-issues">
+                <h4>💡 Clichés to Replace ({{ result.quality_review.cliches | length }})</h4>
                 <ul>
-                    {% for note in result.aligned_resume.tailoring_notes[:5] %}
-                    <li>{{ note }}</li>
+                    {% for cliche in result.quality_review.cliches[:3] %}
+                    <li>
+                        "<strong>{{ cliche.text }}</strong>" → {{ cliche.suggestion }}
+                    </li>
                     {% endfor %}
                 </ul>
             </div>
             {% endif %}
         </div>
+        {% endif %}
+
+        <!-- Content Optimization Section -->
+        {% if result.content_optimization.optimized_summary %}
+        <div class="ats-section">
+            <h3>✍️ Content Optimizations</h3>
+            
+            <div class="optimization-item">
+                <h4>Summary Enhancement</h4>
+                <p class="opt-explanation">{{ result.content_optimization.optimized_summary.explanation }}</p>
+                <div class="keyword-tags">
+                    {% for kw in result.content_optimization.optimized_summary.keywords_integrated %}
+                    <span class="keyword-tag">{{ kw }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            {% if result.content_optimization.optimized_skills %}
+            <div class="optimization-item">
+                <h4>Skills Prioritization</h4>
+                <p class="opt-explanation">{{ result.content_optimization.optimized_skills.explanation }}</p>
+                {% if result.content_optimization.optimized_skills.skills_to_add %}
+                <p><strong>Suggested additions:</strong> {{ result.content_optimization.optimized_skills.skills_to_add | join(', ') }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Role Calibration Section -->
+        {% if result.role_calibration.tone_assessment %}
+        <div class="ats-section">
+            <h3>🎭 Role-Level Calibration</h3>
+            <div class="calibration-box">
+                <p><strong>Target Level:</strong> {{ result.role_calibration.tone_assessment.target_level | title }}</p>
+                <p><strong>Tone Alignment:</strong> {{ result.role_calibration.tone_assessment.alignment_score }}%</p>
+                
+                {% if result.role_calibration.tone_assessment.issues %}
+                <h4>Adjustments Made:</h4>
+                <ul>
+                    {% for issue in result.role_calibration.tone_assessment.issues %}
+                    <li>{{ issue }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Keyword Coverage Analysis -->
+        <div class="ats-section">
+            <h3>🔑 Keyword Analysis</h3>
+            
+            {% if result.match_score.score_breakdown.keyword_match.matched_keywords %}
+            <h4>Matched Keywords ({{ result.match_score.score_breakdown.keyword_match.matched_keywords | length }})</h4>
+            <div class="keyword-tags">
+                {% for keyword in result.match_score.score_breakdown.keyword_match.matched_keywords[:15] %}
+                <span class="keyword-tag covered">{{ keyword }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if result.match_score.score_breakdown.keyword_match.missing_keywords %}
+            <h4 style="margin-top: 1.5rem; color: #e74c3c;">Missing Critical Keywords</h4>
+            <div class="keyword-tags">
+                {% for keyword in result.match_score.score_breakdown.keyword_match.missing_keywords %}
+                <span class="keyword-tag missing">{{ keyword }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Job Requirements Analysis -->
+        {% if result.job_analysis.qualifications %}
+        <div class="ats-section">
+            <h3>📚 Requirements Coverage</h3>
+            <div class="requirements-box">
+                <h4>Required Skills</h4>
+                <ul>
+                    {% for skill in result.job_analysis.qualifications.required.must_have_skills[:5] %}
+                    <li>{{ skill }}</li>
+                    {% endfor %}
+                </ul>
+                
+                {% if result.job_analysis.qualifications.required.experience_years %}
+                <p><strong>Experience Required:</strong> {{ result.job_analysis.qualifications.required.experience_years }} years</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Improvement Priority -->
+        {% if result.match_score.improvement_priority %}
+        <div class="ats-section">
+            <h3>🚀 Top Improvements</h3>
+            <ul class="improvement-list">
+                {% for improvement in result.match_score.improvement_priority[:3] %}
+                <li>
+                    <span class="impact-badge {{ improvement.impact }}">{{ improvement.impact | upper }}</span>
+                    <strong>{{ improvement.area | replace('_', ' ') | title }}:</strong> {{ improvement.suggestion }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
 
         <div class="card">
             <h4>Next Steps</h4>
             <ul style="list-style: none; padding: 0;">
-                <li style="margin-bottom: 0.5rem;">✅ Review and customize the resume</li>
+                <li style="margin-bottom: 0.5rem;">✅ Review match score and optimizations</li>
+                <li style="margin-bottom: 0.5rem;">✅ Address missing keywords if needed</li>
                 <li style="margin-bottom: 0.5rem;">✅ Download as Markdown for editing</li>
                 <li style="margin-bottom: 0.5rem;">✅ Export to PDF using print function</li>
                 <li>✅ Apply with confidence!</li>
@@ -93,4 +239,244 @@
     <a href="/role/{{ session_id }}" class="btn-primary">Try Again</a>
 </div>
 {% endif %}
+
+<style>
+.match-score-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.match-score-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.match-score-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.score-circle {
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid rgba(255,255,255,0.3);
+}
+
+.score-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.score-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.match-summary {
+    margin: 1rem 0;
+    font-size: 1.1rem;
+    opacity: 0.95;
+}
+
+.score-breakdown {
+    background: rgba(255,255,255,0.15);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+}
+
+.score-item {
+    display: grid;
+    grid-template-columns: 120px 1fr 60px;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.score-label-small {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.score-bar {
+    background: rgba(255,255,255,0.2);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.score-fill {
+    background: white;
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.score-value {
+    text-align: right;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.quality-scores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.quality-metric {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.metric-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.metric-score {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.quality-issues {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 4px;
+}
+
+.quality-issues h4 {
+    margin-top: 0;
+    color: #856404;
+}
+
+.quality-issues ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.5rem;
+}
+
+.quality-issues li {
+    margin-bottom: 0.75rem;
+}
+
+.optimization-item {
+    background: #e8f4f8;
+    border-left: 4px solid #17a2b8;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.optimization-item h4 {
+    margin-top: 0;
+    color: #0c5460;
+}
+
+.opt-explanation {
+    font-size: 0.95rem;
+    margin: 0.5rem 0;
+}
+
+.calibration-box {
+    background: #f0f0f0;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.calibration-box ul {
+    margin-top: 0.5rem;
+}
+
+.requirements-box {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.requirements-box h4 {
+    margin-top: 0;
+    color: #495057;
+}
+
+.improvement-list {
+    list-style: none;
+    padding: 0;
+}
+
+.improvement-list li {
+    background: #fff;
+    border-left: 4px solid #28a745;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 4px;
+}
+
+.impact-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.impact-badge.high {
+    background: #dc3545;
+    color: white;
+}
+
+.impact-badge.medium {
+    background: #ffc107;
+    color: #333;
+}
+
+.impact-badge.low {
+    background: #28a745;
+    color: white;
+}
+
+.keyword-tag {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    margin: 0.25rem;
+    font-size: 0.85rem;
+}
+
+.keyword-tag.covered {
+    background: #28a745;
+}
+
+.keyword-tag.missing {
+    background: #dc3545;
+}
+
+.keyword-tag.emphasized {
+    background: #17a2b8;
+}
+</style>
 {% endblock %}
