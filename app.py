@@ -191,7 +191,7 @@ def upload_and_create_profile():
         # Add education entries
         for edu in parsed_data.get('education', []):
             education = Education(
-                user_profile_id=user_profile.id,
+                profile_id=user_profile.id,
                 degree=sanitize_html(edu.get('degree', '')),
                 field_of_study=sanitize_html(edu.get('field_of_study', '')),
                 institution=sanitize_html(edu.get('institution', '')),
@@ -205,7 +205,7 @@ def upload_and_create_profile():
         # Add experience entries
         for exp in parsed_data.get('experience', []):
             experience = Experience(
-                user_profile_id=user_profile.id,
+                profile_id=user_profile.id,
                 title=sanitize_html(exp.get('title', '')),
                 company=sanitize_html(exp.get('company', '')),
                 location=sanitize_html(exp.get('location', '')),
@@ -219,7 +219,7 @@ def upload_and_create_profile():
         # Add skills
         for skill in parsed_data.get('skills', []):
             skill_entry = Skill(
-                user_profile_id=user_profile.id,
+                profile_id=user_profile.id,
                 name=sanitize_html(skill.get('name', skill if isinstance(skill, str) else '')),
                 category=sanitize_html(skill.get('category', '') if isinstance(skill, dict) else ''),
                 proficiency=sanitize_html(skill.get('proficiency', '') if isinstance(skill, dict) else '')
@@ -229,7 +229,7 @@ def upload_and_create_profile():
         # Add projects if any
         for proj in parsed_data.get('projects', []):
             project = Project(
-                user_profile_id=user_profile.id,
+                profile_id=user_profile.id,
                 name=sanitize_html(proj.get('name', '')),
                 description=sanitize_html(proj.get('description', '')),
                 technologies=sanitize_html(proj.get('technologies', '')),
