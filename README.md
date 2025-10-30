@@ -192,14 +192,45 @@ Potential enhancements:
 
 Your professional profile and resume data are stored locally in the SQLite database. No information is sent to external services except OpenAI API calls for AI-powered generation (which can be disabled by running in fallback mode).
 
-## Development
+## Running Locally (After Download)
 
-To run locally:
+### 1. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Set Up Environment Variables
+
+Create a `.env` file in the root directory:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and add your OpenAI API key:
+
+```
+OPENAI_API_KEY=sk-your-actual-api-key-here
+SESSION_SECRET=your-random-secret-key
+```
+
+**Getting an OpenAI API Key:**
+1. Go to https://platform.openai.com/api-keys
+2. Sign in or create an account
+3. Click "Create new secret key"
+4. Copy the key (starts with "sk-...")
+5. Paste it into your `.env` file
+
+### 3. Run the Application
+
 ```bash
 python app.py
 ```
 
 The app will start on `http://0.0.0.0:5000`
+
+**Note:** The OpenAI API key is optional. If you don't provide it, the app will use the fallback regex-based parser which still works great for most resumes!
 
 ## License
 

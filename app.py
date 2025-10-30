@@ -5,6 +5,10 @@ from flask import Flask, render_template, request, redirect, url_for, session, R
 import json
 import bleach
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 from models import db
 from models.user_profile import UserProfile, Education, Experience, Skill, Project, RoleSubmission
